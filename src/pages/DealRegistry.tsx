@@ -23,44 +23,7 @@ import {
 } from 'lucide-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu'
 
-const deals = [
-  {
-    id: 'DEAL-001',
-    title: 'Enterprise CRM Implementation',
-    partner: 'TechSolutions Inc.',
-    client: 'Acme Corporation',
-    value: 125000,
-    status: 'Approved',
-    stage: 'Negotiation',
-    probability: 85,
-    expectedClose: '2024-02-15',
-    createdAt: '2024-01-10'
-  },
-  {
-    id: 'DEAL-002',
-    title: 'Marketing Automation Setup',
-    partner: 'Digital Partners LLC',
-    client: 'StartupXYZ',
-    value: 45000,
-    status: 'Submitted',
-    stage: 'Proposal',
-    probability: 60,
-    expectedClose: '2024-02-28',
-    createdAt: '2024-01-12'
-  },
-  {
-    id: 'DEAL-003',
-    title: 'Cloud Migration Project',
-    partner: 'CloudFirst Solutions',
-    client: 'MegaCorp Ltd',
-    value: 89000,
-    status: 'Draft',
-    stage: 'Qualification',
-    probability: 40,
-    expectedClose: '2024-03-10',
-    createdAt: '2024-01-15'
-  }
-]
+
 
 export function DealRegistry() {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -88,45 +51,60 @@ export function DealRegistry() {
     try {
       setLoading(true)
       const user = await blink.auth.me()
-      // For now, use mock data since database isn't set up yet
-      setDeals([
-        {
-          id: 'DEAL-001',
-          title: 'Small Business CRM Setup',
-          partnerName: 'Local Tech Partners',
-          clientName: 'Smith & Co',
-          value: 8500,
-          status: 'Approved',
-          stage: 'Closing',
-          probability: 90,
-          expectedCloseDate: '2024-02-15',
-          createdAt: '2024-01-10'
-        },
-        {
-          id: 'DEAL-002',
-          title: 'Website Redesign Project',
-          partnerName: 'Design Studio Co',
-          clientName: 'Local Restaurant',
-          value: 12000,
-          status: 'Submitted',
-          stage: 'Proposal',
-          probability: 70,
-          expectedCloseDate: '2024-02-28',
-          createdAt: '2024-01-12'
-        },
-        {
-          id: 'DEAL-003',
-          title: 'Email Marketing Setup',
-          partnerName: 'Marketing Pros',
-          clientName: 'Fitness Studio',
-          value: 3500,
-          status: 'Draft',
-          stage: 'Qualification',
-          probability: 50,
-          expectedCloseDate: '2024-03-10',
-          createdAt: '2024-01-15'
-        }
-      ])
+      
+      // Try to load from localStorage first, then fallback to mock data
+      const savedDeals = localStorage.getItem(`deals_${user.id}`)
+      if (savedDeals) {
+        setDeals(JSON.parse(savedDeals))
+      } else {
+        // Initialize with sample data
+        const initialDeals = [
+          {
+            id: 'DEAL-001',
+            title: 'Small Business CRM Setup',
+            partnerName: 'Local Tech Partners',
+            clientName: 'Smith & Co',
+            clientEmail: 'john@smithco.com',
+            value: 8500,
+            status: 'Approved',
+            stage: 'Closing',
+            probability: 90,
+            expectedCloseDate: '2024-02-15',
+            createdAt: '2024-01-10',
+            userId: user.id
+          },
+          {
+            id: 'DEAL-002',
+            title: 'Website Redesign Project',
+            partnerName: 'Design Studio Co',
+            clientName: 'Local Restaurant',
+            clientEmail: 'info@localrestaurant.com',
+            value: 12000,
+            status: 'Submitted',
+            stage: 'Proposal',
+            probability: 70,
+            expectedCloseDate: '2024-02-28',
+            createdAt: '2024-01-12',
+            userId: user.id
+          },
+          {
+            id: 'DEAL-003',
+            title: 'Email Marketing Setup',
+            partnerName: 'Marketing Pros',
+            clientName: 'Fitness Studio',
+            clientEmail: 'owner@fitnessstudio.com',
+            value: 3500,
+            status: 'Draft',
+            stage: 'Qualification',
+            probability: 50,
+            expectedCloseDate: '2024-03-10',
+            createdAt: '2024-01-15',
+            userId: user.id
+          }
+        ]
+        setDeals(initialDeals)
+        localStorage.setItem(`deals_${user.id}`, JSON.stringify(initialDeals))
+      }
     } catch (error) {
       console.error('Error loading deals:', error)
       toast({
@@ -160,16 +138,23 @@ export function DealRegistry() {
         title: formData.title,
         partnerName: user.displayName || user.email,
         clientName: formData.clientName,
+        clientEmail: formData.clientEmail,
         value: parseInt(formData.value),
         status: 'Draft',
         stage: formData.stage || 'Prospecting',
         probability: parseInt(formData.probability) || 50,
         expectedCloseDate: formData.expectedCloseDate,
-        createdAt: new Date().toISOString().split('T')[0]
+        description: formData.description,
+        createdAt: new Date().toISOString().split('T')[0],
+        userId: user.id
       }
 
       // Add to deals list (optimistic update)
-      setDeals(prev => [newDeal, ...prev])
+      const updatedDeals = [newDeal, ...deals]
+      setDeals(updatedDeals)
+      
+      // Save to localStorage
+      localStorage.setItem(`deals_${user.id}`, JSON.stringify(updatedDeals))
       
       // Reset form
       setFormData({
@@ -437,7 +422,14 @@ export function DealRegistry() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {deals.map((deal) => (
+                {deals
+                  .filter(deal => 
+                    searchTerm === '' || 
+                    deal.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    deal.clientName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    deal.partnerName?.toLowerCase().includes(searchTerm.toLowerCase())
+                  )
+                  .map((deal) => (
                   <TableRow key={deal.id}>
                     <TableCell className="font-medium">{deal.id}</TableCell>
                     <TableCell>
