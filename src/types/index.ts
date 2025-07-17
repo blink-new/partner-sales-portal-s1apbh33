@@ -71,6 +71,13 @@ export interface User {
   email: string
   displayName?: string
   avatar?: string
+  role?: 'admin' | 'manager' | 'user'
+  permissions?: string[]
+  department?: string
+  lastLogin?: string
+  status?: 'active' | 'inactive' | 'pending'
+  createdAt?: string
+  updatedAt?: string
 }
 
 export interface DashboardStats {

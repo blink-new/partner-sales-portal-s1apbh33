@@ -15,6 +15,7 @@ import { Activities } from '@/pages/Activities'
 import { Analytics } from '@/pages/Analytics'
 import { Settings } from '@/pages/Settings'
 import { EmailMarketing } from '@/pages/EmailMarketing'
+import { UserManagement } from '@/pages/UserManagement'
 import { blink } from '@/blink/client'
 
 function App() {
@@ -85,6 +86,8 @@ function App() {
         return <Analytics />
       case 'Settings':
         return <Settings />
+      case 'User Management':
+        return <UserManagement />
       default:
         return <Dashboard />
     }

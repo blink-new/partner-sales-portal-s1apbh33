@@ -12,7 +12,8 @@ import {
   Target,
   Phone,
   TrendingUp,
-  Mail
+  Mail,
+  UserCog
 } from 'lucide-react'
 import {
   Sidebar,
@@ -89,6 +90,11 @@ const sharedMenuItems = [
     title: 'Analytics',
     url: '#',
     icon: TrendingUp,
+  },
+  {
+    title: 'User Management',
+    url: '#',
+    icon: UserCog,
   },
   {
     title: 'Settings',
