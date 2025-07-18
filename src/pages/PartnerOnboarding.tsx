@@ -577,6 +577,10 @@ export function PartnerOnboarding() {
                 <Button variant="outline" size="icon">
                   <Filter className="h-4 w-4" />
                 </Button>
+                <Button variant="outline" className="ml-2">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Export Report
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -673,6 +677,14 @@ export function PartnerOnboarding() {
                             <DropdownMenuItem>
                               <Eye className="mr-2 h-4 w-4" />
                               View Details
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Mail className="mr-2 h-4 w-4" />
+                              Send Reminder
+                            </DropdownMenuItem>
+                            <DropdownMenuItem>
+                              <Calendar className="mr-2 h-4 w-4" />
+                              Schedule Meeting
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
